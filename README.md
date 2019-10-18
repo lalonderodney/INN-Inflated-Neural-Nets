@@ -7,10 +7,8 @@ The original paper can be found at [MICCAI 2019](https://link.springer.com/chapt
 
 A project page for this work can be found at [my research blog](https://rodneylalonde.wixsite.com/personal/post/inn-inflated-neural-networks-for-ipmn-diagnosis).
 
-<img src="imgs/qualitative1.png" width="900px"/>
-
-## Abstract
-Intraductal papillary mucinous neoplasm (IPMN) is a precursor to pancreatic ductal adenocarcinoma. While over half of patients are diagnosed with pancreatic cancer at a distant stage, patients who are diagnosed early enjoy a much higher 5-year survival rate of 34% compared to 3% in the former; hence, early diagnosis is key. Unique challenges in the medical imaging domain such as extremely limited annotated data sets and typically large 3D volumetric data have made it difficult for deep learning to secure a strong foothold. In this work, we construct two novel "inflated" deep network architectures, InceptINN and DenseINN, for the task of diagnosing IPMN from multisequence (T1 and T2) MRI. These networks inflate their 2D layers to 3D and bootstrap weights from their 2D counterparts (Inceptionv3 and DenseNet121 respectively) trained on ImageNet to the new 3D kernels. We also extend the inflation process by further expanding the pre-trained kernels to handle any number of input modalities and different fusion strategies. This is one of the first studies to train an end-to-end deep network on multisequence MRI for IPMN diagnosis, and shows that our proposed novel inflated network architectures are able to handle the extremely limited training data (139 MRI scans), while providing an absolute improvement of 8.76% in accuracy for diagnosing IPMN over the current state-of-the-art.
+## Summary
+Intraductal papillary mucinous neoplasm (IPMN) is a precursor to pancreatic ductal adenocarcinoma. While over half of patients are diagnosed with pancreatic cancer at a distant stage, patients who are diagnosed early enjoy a much higher 5-year survival rate of 34% compared to 3% in the former; hence, early diagnosis is key. Unique challenges in the medical imaging domain such as extremely limited annotated data sets and typically large 3D volumetric data have made it difficult for deep learning to secure a strong foothold. 
 
 ## Multisequence MRI scans
 
@@ -22,9 +20,13 @@ Intraductal papillary mucinous neoplasm (IPMN) is a precursor to pancreatic duct
 
 ## INN Framework Overview
 
+In this work, we construct two novel "inflated" deep network architectures, InceptINN and DenseINN, for the task of diagnosing IPMN from multisequence (T1 and T2) MRI. These networks inflate their 2D layers to 3D and bootstrap weights from their 2D counterparts (Inceptionv3 and DenseNet121 respectively) trained on ImageNet to the new 3D kernels. We also extend the inflation process by further expanding the pre-trained kernels to handle any number of input modalities and different fusion strategies.
+
 <img src="imgs/fusion_figure.png" width="900px"/>
 
 ## Quantative Results on the IPMN Diagnosis Dataset
+
+This is one of the first studies to train an end-to-end deep network on multisequence MRI for IPMN diagnosis, and shows that our proposed novel inflated network architectures are able to handle the extremely limited training data (139 MRI scans), while providing an absolute improvement of 8.76% in accuracy for diagnosing IPMN over the current state-of-the-art.
 
 <img src="imgs/results.png" width="900px"/>
 
