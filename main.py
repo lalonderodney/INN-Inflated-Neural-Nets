@@ -94,7 +94,7 @@ def main(args):
     # If the user selected to do predictions (no GT), load those prediction images
     if args.pred:
         with open(os.path.join(args.data_root_dir, 'split_lists', args.exp_name,
-                               'pred_split_{}.csv'.format(args.split_num)), 'rb') as f:
+                               'pred_split_{}.csv'.format(args.split_num)), 'r') as f:
             reader = csv.reader(f)
             pred_list = list(reader)
         all_imgs_list = all_imgs_list + list(pred_list)

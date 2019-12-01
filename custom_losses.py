@@ -13,51 +13,6 @@ This file contains the definitions of custom loss functions not present in the d
 from __future__ import print_function
 
 import tensorflow as tf
-from keras import backend as K
-
-
-def precision_at_thresholds(n_class, thresholds=[0.5]):
-    # Wrapper function for using TF's precision metric
-    def precision(y_true, y_pred):
-        precision, up_opt = tf.metrics.precision_at_thresholds(y_true, y_pred, thresholds=thresholds)
-        K.get_session().run(tf.local_variables_initializer())
-        with tf.control_dependencies([up_opt]):
-            precision = tf.identity(precision)
-        return precision
-    return precision
-
-
-def recall_at_thresholds(n_class, thresholds=[0.5]):
-    # Wrapper function for using TF's recall metric
-    def recall(y_true, y_pred):
-        recall, up_opt = tf.metrics.recall_at_thresholds(y_true, y_pred, thresholds=thresholds)
-        K.get_session().run(tf.local_variables_initializer())
-        with tf.control_dependencies([up_opt]):
-            recall = tf.identity(recall)
-        return recall
-    return recall
-
-
-def compute_auc(curve):
-    # Wrapper function for using TF's AUC metric
-    def auc_roc(y_true, y_pred):
-        auc, up_opt = tf.metrics.auc(y_true, y_pred, curve='ROC', summation_method='careful_interpolation')
-        K.get_session().run(tf.local_variables_initializer())
-        with tf.control_dependencies([up_opt]):
-            auc = tf.identity(auc)
-        return auc
-    def auc_pr(y_true, y_pred):
-        auc, up_opt = tf.metrics.auc(y_true, y_pred, curve='PR', summation_method='careful_interpolation')
-        K.get_session().run(tf.local_variables_initializer())
-        with tf.control_dependencies([up_opt]):
-            auc = tf.identity(auc)
-        return auc
-    if curve == 'ROC':
-        return auc_roc
-    elif curve == 'PR':
-        return auc_pr
-    else:
-        raise Exception('Invalid selection for auc curve type: Must be "ROC" or "PR"')
 
 
 def binary_crossentropy_loss():
@@ -76,9 +31,9 @@ def binary_crossentropy_loss():
         # expects logits, Keras expects probabilities.
         if not from_logits:
             # transform back to logits
-            _epsilon = tf.convert_to_tensor(1e-7, output.dtype.base_dtype)
+            _epsilon = tf.convert_to_tensor(value=1e-7, dtype=output.dtype.base_dtype)
             output = tf.clip_by_value(output, _epsilon, 1 - _epsilon)
-            output = tf.log(output / (1 - output))
+            output = tf.math.log(output / (1 - output))
 
         return tf.nn.sigmoid_cross_entropy_with_logits(labels=target, logits=output)
 
@@ -102,11 +57,11 @@ def weighted_binary_crossentropy_loss(pos_weight):
         # expects logits, Keras expects probabilities.
         if not from_logits:
             # transform back to logits
-            _epsilon = tf.convert_to_tensor(1e-7, output.dtype.base_dtype)
+            _epsilon = tf.convert_to_tensor(value=1e-7, dtype=output.dtype.base_dtype)
             output = tf.clip_by_value(output, _epsilon, 1 - _epsilon)
-            output = tf.log(output / (1 - output))
+            output = tf.math.log(output / (1 - output))
 
-        return tf.nn.weighted_cross_entropy_with_logits(targets=target, logits=output, pos_weight=pos_weight)
+        return tf.nn.weighted_cross_entropy_with_logits(labels=target, logits=output, pos_weight=pos_weight)
     return weighted_binary_crossentropy
 
 
@@ -141,12 +96,12 @@ def categorical_crossentropy_loss():
         # expects logits, Keras expects probabilities.
         if not from_logits:
             # scale preds so that the class probas of each sample sum to 1
-            output /= tf.reduce_sum(output, axis, True)
+            output /= tf.reduce_sum(input_tensor=output, axis=axis, keepdims=True)
             # manual computation of crossentropy
-            _epsilon = tf.convert_to_tensor(1e-7, output.dtype.base_dtype)
+            _epsilon = tf.convert_to_tensor(value=1e-7, dtype=output.dtype.base_dtype)
             output = tf.clip_by_value(output, _epsilon, 1. - _epsilon)
-            return - tf.reduce_sum(target * tf.log(output), axis)
+            return - tf.reduce_sum(input_tensor=target * tf.math.log(output), axis=axis)
         else:
-            return tf.nn.softmax_cross_entropy_with_logits(labels=target, logits=output)
+            return tf.nn.softmax_cross_entropy_with_logits(labels=tf.stop_gradient(target), logits=output)
 
     return categorical_crossentropy

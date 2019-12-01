@@ -58,7 +58,7 @@ class SubPixelUpscaling(Layer):
         pass
 
     def call(self, x, mask=None):
-        y = tf.depth_to_space(x, self.scale_factor, self.data_format)
+        y = tf.compat.v1.depth_to_space(input=x, block_size=self.scale_factor, name=self.data_format)
         return y
 
     def compute_output_shape(self, input_shape):

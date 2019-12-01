@@ -52,7 +52,7 @@ def predict(args, pred_list, pred_model, net_input_shape):
         pass
 
     # Create a CSV for saving the predictions
-    with open(os.path.join(output_dir, args.save_prefix + 'preds.csv'), 'wb') as csvfile:
+    with open(os.path.join(output_dir, args.save_prefix + 'preds.csv'), 'w') as csvfile:
         writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
         row = ['Scan Name', 'Prediction']

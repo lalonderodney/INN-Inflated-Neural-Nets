@@ -26,7 +26,7 @@ from keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping, ReduceLRO
 from keras.metrics import binary_accuracy, categorical_accuracy
 import tensorflow as tf
 
-from custom_losses import binary_crossentropy_loss, precision_at_thresholds, recall_at_thresholds, compute_auc
+from custom_losses import binary_crossentropy_loss
 from load_3D_data import load_class_weights, generate_train_batches, generate_val_batches
 
 debug = True
@@ -62,7 +62,7 @@ def get_callbacks(arguments):
     monitor_name = 'val_' + out_num + 'accuracy'
 
     csv_logger = CSVLogger(os.path.join(arguments.log_dir, arguments.output_name + '_log_' + arguments.time + '.csv'), separator=',')
-    tb = TensorBoard(arguments.tf_log_dir, batch_size=arguments.batch_size, histogram_freq=0)
+    tb = TensorBoard(arguments.tf_log_dir, histogram_freq=0)
     model_checkpoint = ModelCheckpoint(os.path.join(arguments.check_dir,
                                             arguments.output_name + '_model_' + arguments.time + '.hdf5'),
                                        monitor=monitor_name, save_best_only=True, save_weights_only=True,
@@ -80,12 +80,9 @@ def compile_model(args, train_list, net_input_shape, uncomp_model):
         opt = Adam(lr=args.initial_lr, beta_1=0.99, beta_2=0.999, decay=1e-6)
 
     # A set of useful metrics
-    precision = precision_at_thresholds(args.num_classes)
-    recall = recall_at_thresholds(args.num_classes)
-    auc_roc = compute_auc(curve='ROC')
-    auc_pr = compute_auc(curve='PR')
+    metrics = [tf.keras.metrics.Precision(), tf.keras.metrics.Recall(), tf.keras.metrics.AUC(curve='PR'),
+               tf.keras.metrics.AUC(curve='ROC')]
 
-    metrics = [precision, recall, auc_roc, auc_pr]
     if args.num_classes > 2:
         metrics.append(categorical_accuracy)
     else:
@@ -102,10 +99,10 @@ def compile_model(args, train_list, net_input_shape, uncomp_model):
     else:
         from keras.utils.training_utils import multi_gpu_model
         with tf.device("/cpu:0"):
-            uncomp_model.compile(optimizer=opt, loss=loss, loss_weights=loss_weighting, metrics=metrics)
+            uncomp_model.compile(optimizer=opt, loss=loss, metrics=metrics)
             model = multi_gpu_model(uncomp_model, gpus=args.gpus)
             model.__setattr__('callback_model', uncomp_model)
-        model.compile(optimizer=opt, loss=loss, loss_weights=loss_weighting, metrics=metrics)
+        model.compile(optimizer=opt, loss=loss, metrics=metrics)
         return model, loss_weighting
 
 

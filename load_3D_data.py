@@ -45,10 +45,10 @@ debug = False
 def load_data(root, mod_dirs, exp_name, split=0, k_folds=4, val_split=0.1, rand_seed=5):
     # Main functionality of loading and spliting the data
     def _load_data():
-        with open(os.path.join(root, 'split_lists', exp_name, 'train_split_{}.csv'.format(split)), 'rb') as f:
+        with open(os.path.join(root, 'split_lists', exp_name, 'train_split_{}.csv'.format(split)), 'r') as f:
             reader = csv.reader(f)
             training_list = list(reader)
-        with open(os.path.join(root, 'split_lists', exp_name, 'test_split_{}.csv'.format(split)), 'rb') as f:
+        with open(os.path.join(root, 'split_lists', exp_name, 'test_split_{}.csv'.format(split)), 'r') as f:
             reader = csv.reader(f)
             test_list = list(reader)
         X = np.asarray(training_list)[:,:-1]
@@ -112,7 +112,7 @@ def split_data(root_path, mod_dirs_paths, exp_name, num_splits=4, rand_seed=5):
 
     # Load the GT labels for IPMN
     IPMN_GT = dict()
-    with open(os.path.join(root_path, 'IPMN_Ground_Truth.csv'), 'rb') as f:
+    with open(os.path.join(root_path, 'IPMN_Ground_Truth.csv'), 'r') as f:
         for k, v in csv.reader(f):
 
             IPMN_GT[k] = v
@@ -154,7 +154,7 @@ def split_data(root_path, mod_dirs_paths, exp_name, num_splits=4, rand_seed=5):
     skf = StratifiedKFold(n_splits=num_splits, shuffle=True, random_state=rand_seed)
     n = 0
     for train_index, test_index in skf.split(final_img_list, final_label_list):
-        with open(os.path.join(outdir,'train_split_{}.csv'.format(n)), 'wb') as csvfile:
+        with open(os.path.join(outdir,'train_split_{}.csv'.format(n)), 'w') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             for i in train_index:
                 for j in range(np.asarray(img_dirs_pairs_list[i][0]).size):
@@ -162,7 +162,7 @@ def split_data(root_path, mod_dirs_paths, exp_name, num_splits=4, rand_seed=5):
                                      img_dirs_pairs_list[i][1][j].split(root_path)[1][1:],
                                      img_dirs_pairs_list[i][2][j].split(root_path)[1][1:],
                                      img_dirs_pairs_list[i][3]])
-        with open(os.path.join(outdir,'test_split_{}.csv'.format(n)), 'wb') as csvfile:
+        with open(os.path.join(outdir,'test_split_{}.csv'.format(n)), 'w') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             for i in test_index:
                 for j in range(np.asarray(img_dirs_pairs_list[i][0]).size):
@@ -551,9 +551,9 @@ class threadsafe_iter:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         with self.lock:
-            return self.it.next()
+            return self.it.__next__()
 
 
 def threadsafe_generator(f):
