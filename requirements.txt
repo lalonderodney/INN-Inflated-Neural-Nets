@@ -9,3 +9,4 @@ SimpleITK==1.2.3
 tensorflow-gpu==2.0.0
 keras==2.3.1
 h5py==2.9.0
+opencv-python==4.1.2.30
